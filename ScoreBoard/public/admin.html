@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Create a new WebSocket connection
+        const socket = new WebSocket('ws://localhost:8080/getValues');
+
+        // Connection opened
+        socket.addEventListener('open', (event) => {
+        console.log('WebSocket connection established');
+        
+        // Send a message to the server
+        socket.send('Hello, there General Kenobi!');
+        });
+
+        // Listen for messages from the server
+        socket.addEventListener('message', (event) => {
+            console.log('Message from server:', event.data);
+            document.getElementById("score-1").innerHTML = JSON.parse(event.data).team1;
+            document.getElementById("score-2").innerHTML = JSON.parse(event.data).team2;
+        });
+
+        // Handle connection closure
+        socket.addEventListener('close', (event) => {
+        if (event.wasClean) {
+            console.log(`Connection closed cleanly, code=${event.code}, reason=${event.reason}`);
+        } else {
+            console.log('Connection died');
+        }
+        });
+
+        // Handle any errors that occur
+        socket.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
+        });
+        function ChangeScore(team,value){
+            console.log(`The values are ${team} and ${value}`)
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST","/modifyScore");
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            const body = `{"team":"${team}","value":"${value}"}`
+            xhr.send(body)
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN PANEL</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .scoreboard {
+            display: flex;
+            height: 100%;
+        }
+        .team {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .team-name {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .score {
+            font-size: 8em;
+            font-weight: bold;
+            padding: 48px;
+        }
+        #team1 {
+            background-color: #E0A200;
+            color: white;
+        }
+        #team2 {
+            background-color: #01E018;
+            color: white;
+        }
+        button {
+            background-color: transparent;
+            background-repeat: no-repeat;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            outline: none;
+            font-size: 48px;
+            color:white;
+        }
+        #add-button {
+            color: green;
+        }
+        #sub-button {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="scoreboard">
+        <div id="team1" class="team">
+            <div class="team-name">Orange Team</div>
+            <div style="display: inline;">
+                <button class="sub-button" onclick="ChangeScore('team1',-1)">-1</button>
+                <div id="score-1" class="score">0</div>
+                <button class="add-button" onclick="ChangeScore('team1',1)">+1</button>
+            </div>
+        </div>
+        <div id="team2" class="team">
+            <div class="team-name">Green Team</div>
+            <button class="sub-button" onclick="ChangeScore('team2',-1)">-1</button>
+            <div id="score-2" class="score">0</div>
+            <button class="add-button" onclick="ChangeScore('team2',1)">+1</button>
+        </div>
+    </div>
+</body>
+</html>

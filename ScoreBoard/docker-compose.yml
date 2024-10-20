@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  scoreBoard:
+    image: replaySports/scoreBoard:latest
+    container_name: scoreBoard
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE
